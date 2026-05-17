@@ -2,7 +2,7 @@
 local run = function(func)
     local ok, err = pcall(func)
     if not ok then
-        warn('[AEROV4] module failed to load: ' .. tostring(err))
+        warn('[98KA] module failed to load: ' .. tostring(err))
     end
 end
 local vapeEvents = setmetatable({}, {
@@ -2628,7 +2628,7 @@ run(function()
             return nil
         end
 
-        local function AutoClickAero()
+        local function AutoClick98KA()
             if Thread then task.cancel(Thread) end
             Thread = task_spawn(function()
                 repeat
@@ -2674,7 +2674,7 @@ run(function()
                             ActivationScheduled = task.delay(MIN_HOLD_TIME, function()
                                 ActivationScheduled = nil
                                 if inputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
-                                    AutoClickAero()
+                                    AutoClick98KA()
                                 end
                             end)
                         end
@@ -2757,7 +2757,7 @@ run(function()
 
     local function createkitrender(plr)
         local icon = Instance.new("ImageLabel")
-        icon.Name = "AeroV4KitRender" 
+        icon.Name = "98KAKitRender" 
         icon.AnchorPoint = Vector2.new(1, 0.5)
         icon.BackgroundTransparency = 1
         icon.Position = UDim2.new(1.05, 0, 0.5, 0)
@@ -2789,7 +2789,7 @@ run(function()
         end
         
         for _, v in ipairs(PlayerGui:GetDescendants()) do
-            if v:IsA("ImageLabel") and v.Name == "AeroV4KitRender" then  
+            if v:IsA("ImageLabel") and v.Name == "98KAKitRender" then  
                 v:Destroy()
             end
         end
@@ -2852,7 +2852,7 @@ run(function()
             local card = container:FindFirstChild("1") and container["1"]:FindFirstChild("MatchDraftPlayerCard")
             if not card then return end
             
-            local icon = card:FindFirstChild("AeroV4KitRender")  
+            local icon = card:FindFirstChild("98KAKitRender")  
             if not icon then
                 icon = createkitrender(playerFound)
                 icon.Parent = card
@@ -2887,7 +2887,7 @@ run(function()
     local function createKitLabel(parent, kitImage)
         if kitLabels[parent] then kitLabels[parent]:Destroy() end
         local kitLabel = Instance.new("ImageLabel")
-        kitLabel.Name = "AeroV4KitIcon"
+        kitLabel.Name = "98KAKitIcon"
         kitLabel.Size = UDim2.new(1, 0, 1, 0)
         kitLabel.Position = UDim2.new(1.1, 0, 0, 0)
         kitLabel.BackgroundTransparency = 1
@@ -4673,7 +4673,7 @@ run(function()
 	})
 end)
 
--- aero killaura 
+-- 98KA killaura 
 local Attacking
 run(function()
     local Killaura
@@ -7179,7 +7179,7 @@ run(function()
 	local OtherProjectiles
 	local Blacklist
 	local SortMethod
-	local AeroPAChargePercent
+	local 98KAPAChargePercent
 	local RandomHeadPercent
 	local RandomTorsoPercent
 	local CustomPrediction
@@ -7435,7 +7435,7 @@ run(function()
 						return s and r or nil
 					end
 
-					if not getgenv().AeroLocalPaid and plr.Player and getgenv().isAeroPaid and getgenv().isAeroPaid(plr.Player) then
+					if not getgenv().98KALocalPaid and plr.Player and getgenv().is98KAPaid and getgenv().is98KAPaid(plr.Player) then
 						wasHovering = false
 						return old(...)
 					end
@@ -7544,13 +7544,13 @@ run(function()
 						local customDrawDuration = 5
 						if AutoCharge.Enabled then
 							if projmeta.projectile:find('arrow') then
-								customDrawDuration = 0.58 * (AeroPAChargePercent.Value / 100)
+								customDrawDuration = 0.58 * (98KAPAChargePercent.Value / 100)
 							elseif projmeta.projectile:find('frosty_snowball') then
 								local tool = store.hand and store.hand.tool
 								if tool and tool.Name:find('frost_staff') then
 									local cd = (tool.Name:find('frost_staff_3') and 0.16) or
 											(tool.Name:find('frost_staff_2') and 0.18) or 0.2
-									customDrawDuration = cd * (AeroPAChargePercent.Value / 100)
+									customDrawDuration = cd * (98KAPAChargePercent.Value / 100)
 								end
 							end
 						else
@@ -7797,10 +7797,10 @@ run(function()
 		Name = "AutoCharge",
 		Default = true,
 		Function = function(v)
-			if AeroPAChargePercent and AeroPAChargePercent.Object then AeroPAChargePercent.Object.Visible = v end
+			if 98KAPAChargePercent and 98KAPAChargePercent.Object then 98KAPAChargePercent.Object.Visible = v end
 		end
 	})
-	AeroPAChargePercent = ProjectileAimbot:CreateSlider({
+	98KAPAChargePercent = ProjectileAimbot:CreateSlider({
 		Name = 'Charge Percent',
 		Min = 1,
 		Max = 100,
@@ -7867,19 +7867,19 @@ run(function()
 						elseif typeof(bedwars.ShopTaxController.hasTax) == "boolean" then
 							bedwars.ShopTaxController.hasTax = false
 						else
-							vape:CreateNotification('TaxRemover',`Tax Remover error the type of hasTax is {typeof(bedwars.ShopTaxController.hasTax)} report to aero or soryed`,16,'alert')
+							vape:CreateNotification('TaxRemover',`Tax Remover error the type of hasTax is {typeof(bedwars.ShopTaxController.hasTax)} report to 98KA or soryed`,16,'alert')
 							break
 						end
 						if typeof(bedwars.ShopTaxController.taxedItems) == "table" then
 							bedwars.ShopTaxController.taxedItems = {}
 						else
-							vape:CreateNotification('TaxRemover',`Tax Remover error the type of taxedItems is NOT a TABLE PLEASE report to aero or soryed ASAP`,16,'alert')
+							vape:CreateNotification('TaxRemover',`Tax Remover error the type of taxedItems is NOT a TABLE PLEASE report to 98KA or soryed ASAP`,16,'alert')
 							break
 						end
 						if typeof(bedwars.ShopTaxController.addedTaxMap) == "table" then
 							bedwars.ShopTaxController.addedTaxMap = {}
 						else
-							vape:CreateNotification('TaxRemover',`Tax Remover error the type of addedTaxMap is NOT a TABLE PLEASE report to aero or soryed ASAP`,16,'alert')
+							vape:CreateNotification('TaxRemover',`Tax Remover error the type of addedTaxMap is NOT a TABLE PLEASE report to 98KA or soryed ASAP`,16,'alert')
 							break
 						end
 						task.wait()
@@ -9368,7 +9368,7 @@ run(function()
             Strings[ent] = ent.Player and whitelist:tag(ent.Player, true) .. (DisplayName.Enabled and ent.Player.DisplayName or ent.Player.Name) or entityName
 
             if ent.Player and getAccountTier(lplr) > 0 then
-                local injData = getgenv()._aeroInjectedUsers and getgenv()._aeroInjectedUsers[ent.Player.UserId]
+                local injData = getgenv()._98KAInjectedUsers and getgenv()._98KAInjectedUsers[ent.Player.UserId]
                 if injData and getAccountTier(lplr) > injData.tier then
                     Strings[ent] = '<font color="#00FF88">[T'..tostring(injData.tier)..']</font> ' .. Strings[ent]
                 end
@@ -9688,7 +9688,7 @@ run(function()
             Strings[ent] = ent.Player and whitelist:tag(ent.Player, true) .. (DisplayName.Enabled and ent.Player.DisplayName or ent.Player.Name) or entityName
 
             if ent.Player and getAccountTier(lplr) > 0 then
-                local injData = getgenv()._aeroInjectedUsers and getgenv()._aeroInjectedUsers[ent.Player.UserId]
+                local injData = getgenv()._98KAInjectedUsers and getgenv()._98KAInjectedUsers[ent.Player.UserId]
                 if injData and getAccountTier(lplr) > injData.tier then
                     Strings[ent] = '<font color="#00FF88">[T'..tostring(injData.tier)..']</font> ' .. Strings[ent]
                 end
@@ -9875,7 +9875,7 @@ run(function()
                             newKitImage = res.renderImage
                         else
                             if not suc then
-                                warn(`[AEROV4 MODULE ISSUE]: [Module - NameTags (Using bedwars.BedwarsKitMeta)] [Error]: {res}`)
+                                warn(`[98KA MODULE ISSUE]: [Module - NameTags (Using bedwars.BedwarsKitMeta)] [Error]: {res}`)
                             end
                             newKitImage = kitImageIds[kit] or kitImageIds['none']
                         end
@@ -17506,9 +17506,9 @@ run(function()
 	local processing = {}
 
 	local _req = (syn and syn.request) or (http_request and function(t) return http_request(t) end) or request or function() return {Body='{}'} end
-	if not getgenv()._aerov4_getBackendUrl then
+	if not getgenv()._98KA_getBackendUrl then
 		local _cachedUrl
-		getgenv()._aerov4_getBackendUrl = function()
+		getgenv()._98KA_getBackendUrl = function()
 			if _cachedUrl then return _cachedUrl end
 			local ok, res = pcall(function()
 				return _req({Url='https://gist.githubusercontent.com/poopparty/a817668f8805b6d44fa54ff13dc8edf4/raw/url.txt',Method='GET'})
@@ -17519,7 +17519,7 @@ run(function()
 			return _cachedUrl
 		end
 	end
-	local _bu = getgenv()._aerov4_getBackendUrl
+	local _bu = getgenv()._98KA_getBackendUrl
 
 	local listsLoaded = false
 	task.spawn(function()
@@ -17558,7 +17558,7 @@ run(function()
 		listsLoaded = true
 	end)
 
-	getgenv()._aerov4_staffCounts = {spec=0, closet=0, mod=0, impossible=0}
+	getgenv()._98KA_staffCounts = {spec=0, closet=0, mod=0, impossible=0}
 	local function refreshStaffCounts()
 		local c = {spec=0, closet=0, mod=0, impossible=0}
 		for _, data in pairs(detectedPlayers) do
@@ -17568,7 +17568,7 @@ run(function()
 			elseif ct == 'impossible_join' then c.impossible += 1
 			else c.mod += 1 end
 		end
-		getgenv()._aerov4_staffCounts = c
+		getgenv()._98KA_staffCounts = c
 		vapeEvents.StaffCountUpdate:Fire()
 	end
 
@@ -17774,7 +17774,7 @@ run(function()
 	local watchers = {}
 
 	local _req = (syn and syn.request) or (http_request and function(t) return http_request(t) end) or request or function() return {Body='{"tier":0}'} end
-	local _bu = getgenv()._aerov4_getBackendUrl or function()
+	local _bu = getgenv()._98KA_getBackendUrl or function()
 		local ok, res = pcall(function()
 			return _req({Url='https://gist.githubusercontent.com/poopparty/a817668f8805b6d44fa54ff13dc8edf4/raw/url.txt',Method='GET'})
 		end)
@@ -29718,7 +29718,7 @@ run(function()
 						bedwars.GlacialSkaterController:updateMomentum(100, "newValue")
 					end)
 					if not suc then
-						warn(`[AEROV4 MODULE ISSUE]: [Module - InfKrystal (Starting to update Momentum)] [Error]: {res}`)
+						warn(`[98KA MODULE ISSUE]: [Module - InfKrystal (Starting to update Momentum)] [Error]: {res}`)
 						runService:UnbindFromRenderStep('InfiniteKrystalMovement')
 					end
 				end)
@@ -29729,7 +29729,7 @@ run(function()
 					bedwars.GlacialSkaterController:updateMomentum(0, "newValue")
 				end)
 				if not suc then
-					warn(`[AEROV4 MODULE ISSUE]: [Module - InfKrystal (Resetting updateMomentum function)] [Error]: {res}`)
+					warn(`[98KA MODULE ISSUE]: [Module - InfKrystal (Resetting updateMomentum function)] [Error]: {res}`)
 				end
 			end
 		end
@@ -31063,7 +31063,7 @@ run(function()
 		elseif Mode.Value == 'Camera' then
 			targetPos = gameCamera.CFrame.Position + gameCamera.CFrame.LookVector * 200
 		else
-			vape:CreateNotification('MouseTP', 'Mode is currently nil. Report to aero or soryed', 6, 'warning')
+			vape:CreateNotification('MouseTP', 'Mode is currently nil. Report to 98KA or soryed', 6, 'warning')
 			return
 		end
 
@@ -31114,7 +31114,7 @@ run(function()
 				)
 			end
 		else
-			vape:CreateNotification('MouseTP', 'Movement is currently nil. Report to aero or soryed', 6, 'warning')
+			vape:CreateNotification('MouseTP', 'Movement is currently nil. Report to 98KA or soryed', 6, 'warning')
 			return
 		end
 	end

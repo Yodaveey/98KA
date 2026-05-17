@@ -160,7 +160,7 @@ local function _ft(uid)
     return tonumber(data.results[1].tier) or 0
 end
 
-getgenv()._aeroTierReady = false
+getgenv()._98KATierReady = false
 local _fetchQueue = {}
 local _queueRunning = false
 
@@ -190,7 +190,7 @@ end
 
 task.spawn(function()
     _tierCache[lplr.UserId] = _ft(lplr.UserId)
-    getgenv()._aeroTierReady = true
+    getgenv()._98KATierReady = true
     task.wait(1)
     for _, p in playersService:GetPlayers() do
         if p.UserId ~= lplr.UserId then
@@ -263,7 +263,7 @@ local function getAccountTier(player)
     return t
 end
 
-getgenv().getAeroTier = function(player)
+getgenv().get98KATier = function(player)
     return getAccountTier(player)
 end  
 

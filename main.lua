@@ -110,7 +110,7 @@ pcall(migrateProfiles)
 local function finishLoading()
 	vape.Init = nil
 	if not vape.Load then
-		warn('[AEROV4] vape.Load is nil skipping load')
+		warn('[98KA] vape.Load is nil skipping load')
 		return
 	end
 	vape:Load()
@@ -141,7 +141,7 @@ local function finishLoading()
 				teleportScript = 'shared.ValidatedUsername = "' .. shared.ValidatedUsername .. '"\n' .. teleportScript
 			end
 			local _ok, _err = pcall(function() vape:Save() end)
-			if not _ok then warn('[AEROV4] save failed before teleport: ' .. tostring(_err)) end
+			if not _ok then warn('[98KA] save failed before teleport: ' .. tostring(_err)) end
 			queue_on_teleport(teleportScript)
 		end
 	end))
@@ -150,7 +150,7 @@ local function finishLoading()
 		if not vape.Categories then return end
 		if vape.Categories.Main.Options['GUI bind indicator'].Enabled then
 			local name = shared.ValidatedUsername and ('wsg, ' .. shared.ValidatedUsername .. ' :D ') or 'welcome '
-			vape:CreateNotification('[AEROV4] Finished Loading', name .. (vape.VapeButton and 'Press the button in the top right to open GUI' or 'Press ' .. table.concat(vape.Keybind, ' + '):upper() .. ' to open GUI'), 5)
+			vape:CreateNotification('[98KA] Finished Loading', name .. (vape.VapeButton and 'Press the button in the top right to open GUI' or 'Press ' .. table.concat(vape.Keybind, ' + '):upper() .. ' to open GUI'), 5)
 		end
 	end
 end
@@ -166,18 +166,18 @@ end
 
 local guiFunc, guiErr = loadstring(downloadFile('newvape/guis/' .. gui .. '.lua'), 'gui')
 if not guiFunc then
-	error('[AEROV4] Failed to load GUI: ' .. tostring(guiErr))
+	error('[98KA] Failed to load GUI: ' .. tostring(guiErr))
 end
 vape = guiFunc()
 if not vape then
-	error('[AEROV4] GUI returned nil file may be corrupted try deleting newvape/guis/' .. gui .. '.lua and reinjecting.')
+	error('[98KA] GUI returned nil file may be corrupted try deleting newvape/guis/' .. gui .. '.lua and reinjecting.')
 end
 if not vape.Load then
 	if delfile then pcall(function() delfile('newvape/guis/' .. gui .. '.lua') end) end
-	error('[AEROV4] gui file corrupted (missing load) reinject..')
+	error('[98KA] gui file corrupted (missing load) reinject..')
 end
 if not vape.Init and not vape.Load then
-	error('[AEROV4] failed to initialize properly reinject to fix this bs')
+	error('[98KA] failed to initialize properly reinject to fix this bs')
 end
 shared.vape = vape
 task.wait(0.1)
