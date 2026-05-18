@@ -234,17 +234,133 @@ function module.SolveTrajectory(origin, projectileSpeed, gravity, targetPos, tar
 			local d = (h + p*t)/t
 			local e = (j + q*t - l*t*t)/t
 			local f = (k + r*t)/t
-			return origin + Vector3.new(d, e, f)
+			return origin + Vector3.new(d, e, f), t
 		end
 	elseif gravity == 0 then
 		local t = (disp.Magnitude / projectileSpeed)
 		local d = (h + p*t)/t
 		local e = (j + q*t - l*t*t)/t
 		local f = (k + r*t)/t
-		return origin + Vector3.new(d, e, f)
+		return origin + Vector3.new(d, e, f), t
 	end
 	
+	return nil
+end
+
+-- Euler step fallback: simulate projectile + target step by step
+function module.EulerFallback(origin, projectileSpeed, gravity, targetPos, targetVelocity, targetAccel, playerGravity, playerHeight, params)
+	local dt = 1 / 30
+	local maxSteps = 120
+	local projPos = origin
+	local projDir = (targetPos + targetVelocity * 0.3 - origin).Unit
+	local projVel = projDir * projectileSpeed
+	local tPos = targetPos
+	local tVel = targetVelocity
+	local accel = targetAccel or Vector3.zero
+	local pGrav = playerGravity or 0
+
+	for i = 1, maxSteps do
+		-- step projectile
+		projVel = projVel - Vector3.new(0, gravity * dt, 0)
+		projPos = projPos + projVel * dt
+		-- step target
+		tVel = tVel + accel * dt
+		if pGrav > 0 then
+			tVel = tVel - Vector3.new(0, pGrav * dt, 0)
+		end
+		tPos = tPos + tVel * dt
+		-- ground clamp target
+		if params then
+			local gRay = workspace:Raycast(tPos + Vector3.new(0, 5, 0), Vector3.new(0, -30, 0), params)
+			if gRay then
+				local floorY = gRay.Position.Y + (playerHeight or 3)
+				if tPos.Y < floorY then
+					tPos = Vector3.new(tPos.X, floorY, tPos.Z)
+					if tVel.Y < 0 then tVel = Vector3.new(tVel.X, 0, tVel.Z) end
+				end
+			end
+		end
+		-- check if projectile reached target
+		if (projPos - tPos).Magnitude < 6 then
+			return tPos
+		end
+		-- check if projectile passed target plane (went too far)
+		if projPos.Y < origin.Y - 200 then break end
+	end
 	return targetPos
+end
+
+-- Advanced solver: iterative refinement with acceleration, ping comp, ground clamping
+function module.SolveTrajectoryAdvanced(origin, projectileSpeed, gravity, targetPos, targetVelocity, targetAccel, playerGravity, playerHeight, playerJump, params, pingTime)
+	pingTime = pingTime or 0
+	targetAccel = targetAccel or Vector3.zero
+
+	-- advance target state by network latency
+	if pingTime > 0.005 then
+		targetPos = targetPos + targetVelocity * pingTime + 0.5 * targetAccel * pingTime * pingTime
+		targetVelocity = targetVelocity + targetAccel * pingTime
+	end
+
+	-- iteration 1: standard quartic solve
+	local result, t0 = module.SolveTrajectory(origin, projectileSpeed, gravity, targetPos, targetVelocity, playerGravity, playerHeight, playerJump, params)
+
+	if not result then
+		-- quartic failed completely, use Euler stepping
+		return module.EulerFallback(origin, projectileSpeed, gravity, targetPos, targetVelocity, targetAccel, playerGravity, playerHeight, params)
+	end
+
+	-- if no acceleration, the quartic result is already optimal
+	local accelMag = targetAccel.Magnitude
+	if accelMag < 0.5 then
+		return result
+	end
+
+	-- iterative refinement: re-predict target position accounting for acceleration at estimated flight time
+	local bestResult = result
+	local bestT = t0 or ((result - origin).Magnitude / projectileSpeed)
+
+	for iter = 1, 5 do
+		-- predict where target will be at bestT including acceleration
+		local predPos = targetPos + targetVelocity * bestT + 0.5 * targetAccel * bestT * bestT
+
+		-- apply target gravity for vertical
+		if playerGravity and playerGravity > 0 then
+			local vertY = targetVelocity.Y * bestT - 0.5 * playerGravity * bestT * bestT
+			predPos = Vector3.new(predPos.X, targetPos.Y + vertY, predPos.Z)
+		end
+
+		-- ground clamp the predicted position
+		if params then
+			local gRay = workspace:Raycast(
+				Vector3.new(predPos.X, predPos.Y + 8, predPos.Z),
+				Vector3.new(0, -40, 0), params
+			)
+			if gRay then
+				local floorY = gRay.Position.Y + (playerHeight or 3)
+				if predPos.Y < floorY then
+					predPos = Vector3.new(predPos.X, floorY, predPos.Z)
+				end
+			end
+		end
+
+		-- re-solve quartic to this new position with zero velocity (already predicted)
+		local newResult, newT = module.SolveTrajectory(origin, projectileSpeed, gravity, predPos, Vector3.zero, 0, 0, nil, params)
+
+		if not newResult then
+			break
+		end
+
+		bestResult = newResult
+		local prevT = bestT
+		bestT = newT or ((newResult - origin).Magnitude / projectileSpeed)
+
+		-- converged
+		if math.abs(bestT - prevT) < 0.02 then
+			break
+		end
+	end
+
+	return bestResult
 end
 
 return module

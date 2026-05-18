@@ -7207,6 +7207,109 @@ run(function()
 	local paFOVCircleDrawing = nil
 	local AutoCharge
 	local paFOVCircleConnection = nil
+
+	-- velocity tracking for advanced prediction
+	local VEL_BUFFER_SIZE = 8
+	local velBuffers = {}
+	local velTrackConn = nil
+
+	local function getEntityKey(ent)
+		return ent.Player and ent.Player.UserId or tostring(ent.RootPart)
+	end
+
+	local function updateVelBuffers()
+		for _, ent in ipairs(entitylib.List) do
+			if ent.RootPart and ent.RootPart.Parent then
+				local key = getEntityKey(ent)
+				local buf = velBuffers[key]
+				if not buf then
+					buf = {vels = {}, times = {}, idx = 0}
+					velBuffers[key] = buf
+				end
+				buf.idx = buf.idx + 1
+				local i = ((buf.idx - 1) % VEL_BUFFER_SIZE) + 1
+				buf.vels[i] = ent.RootPart.Velocity
+				buf.times[i] = tick()
+			end
+		end
+	end
+
+	local function getSmoothedVelocity(ent)
+		local key = getEntityKey(ent)
+		local buf = velBuffers[key]
+		if not buf or buf.idx < 2 then
+			return ent.RootPart and ent.RootPart.Velocity or Vector3.zero
+		end
+		-- exponentially weighted moving average (recent frames weighted heavier)
+		local sum = Vector3.zero
+		local weight = 0
+		local count = math_min(buf.idx, VEL_BUFFER_SIZE)
+		for n = 1, count do
+			local i = ((buf.idx - n) % VEL_BUFFER_SIZE) + 1
+			local v = buf.vels[i]
+			if v then
+				local w = 1.5 ^ (count - n) -- newer = heavier
+				sum = sum + v * w
+				weight = weight + w
+			end
+		end
+		if weight > 0 then
+			return sum / weight
+		end
+		return ent.RootPart.Velocity
+	end
+
+	local function getAcceleration(ent)
+		local key = getEntityKey(ent)
+		local buf = velBuffers[key]
+		if not buf or buf.idx < 3 then
+			return Vector3.zero
+		end
+		-- average acceleration over last few frames
+		local count = math_min(buf.idx, VEL_BUFFER_SIZE)
+		if count < 2 then return Vector3.zero end
+		local totalAccel = Vector3.zero
+		local samples = 0
+		for n = 1, count - 1 do
+			local i1 = ((buf.idx - n - 1) % VEL_BUFFER_SIZE) + 1
+			local i2 = ((buf.idx - n) % VEL_BUFFER_SIZE) + 1
+			local v1, v2 = buf.vels[i1], buf.vels[i2]
+			local t1, t2 = buf.times[i1], buf.times[i2]
+			if v1 and v2 and t1 and t2 then
+				local dt = t2 - t1
+				if dt > 0.001 then
+					totalAccel = totalAccel + (v2 - v1) / dt
+					samples = samples + 1
+				end
+			end
+		end
+		if samples > 0 then
+			return totalAccel / samples
+		end
+		return Vector3.zero
+	end
+
+	local function getNetworkPing()
+		local ok, ping = pcall(function()
+			local stats = game:GetService('Stats')
+			local net = stats:FindFirstChild('PerformanceStats')
+			if net then
+				local p = net:FindFirstChild('Ping')
+				if p then return p:GetValue() / 1000 end
+			end
+			-- fallback
+			return (lplr:GetNetworkPing()) / 1000
+		end)
+		if ok and type(ping) == 'number' and ping > 0 then
+			return math_clamp(ping, 0, 0.3)
+		end
+		-- last resort
+		local ok2, p2 = pcall(function() return lplr:GetNetworkPing() end)
+		if ok2 and type(p2) == 'number' then
+			return math_clamp(p2, 0, 0.3)
+		end
+		return 0.05
+	end
 	local function runPAFOVCircle(call)
 		if paFOVCircleConnection then
 			paFOVCircleConnection:Disconnect()
@@ -7412,6 +7515,10 @@ run(function()
 							updateCursor()
 						end)
 					end
+					-- start velocity tracking
+					velBuffers = {}
+					if velTrackConn then velTrackConn:Disconnect() end
+					velTrackConn = runService.Heartbeat:Connect(updateVelBuffers)
 
 					old = bedwars.ProjectileController.calculateImportantLaunchValues
 					bedwars.ProjectileController.calculateImportantLaunchValues = function(...)
@@ -7512,7 +7619,11 @@ run(function()
 						end
 					end
 
-					local targetVelocity = targetBodyPart.Velocity
+					-- smoothed velocity instead of raw frame read
+					local targetVelocity = getSmoothedVelocity(plr)
+					local targetAccel = getAcceleration(plr)
+					local pingTime = getNetworkPing()
+
 					if CustomPrediction and CustomPrediction.Enabled then
 						local hMult = (HorizontalMultiplier and HorizontalMultiplier.Value or 100) / 100
 						local vMult = (VerticalMultiplier and VerticalMultiplier.Value or 100) / 100
@@ -7521,7 +7632,19 @@ run(function()
 							targetVelocity.Y * vMult,
 							targetVelocity.Z * hMult
 						)
+						targetAccel = Vector3.new(
+							targetAccel.X * hMult,
+							targetAccel.Y * vMult,
+							targetAccel.Z * hMult
+						)
 					end
+
+					if projmeta.projectile == 'telepearl' then
+						targetVelocity = Vector3.zero
+						targetAccel = Vector3.zero
+						pingTime = 0
+					end
+
 					local bowRelX = bedwars.BowConstantsTable.RelX or 0
 					local bowRelY = bedwars.BowConstantsTable.RelY or 0
 					local bowRelZ = bedwars.BowConstantsTable.RelZ or 0
@@ -7529,11 +7652,13 @@ run(function()
 						CFrame.new(projmeta.projectile == 'owl_projectile' and Vector3.zero or
 							Vector3.new(bowRelX, bowRelY, bowRelZ))
 
-					local calc = prediction.SolveTrajectory(
+					local calc = prediction.SolveTrajectoryAdvanced(
 						newlook.p, projSpeed, gravity,
 						targetBodyPart.Position,
-						projmeta.projectile == 'telepearl' and Vector3.zero or targetVelocity,
-						playerGravity, plr.HipHeight, plr.Jumping and 42.6 or nil, rayCheck
+						targetVelocity,
+						targetAccel,
+						playerGravity, plr.HipHeight, plr.Jumping and 42.6 or nil,
+						rayCheck, pingTime
 					)
 
 					if calc then
@@ -7554,7 +7679,7 @@ run(function()
 								end
 							end
 						else
-							    customDrawDuration = 0.05
+							customDrawDuration = 0.05
 						end
 
 						wasHovering = false
@@ -7574,6 +7699,12 @@ run(function()
 				bedwars.ProjectileController.calculateImportantLaunchValues = old
 				wasHovering = false
 				lockedRandomPart = nil
+				-- stop velocity tracking
+				if velTrackConn then
+					velTrackConn:Disconnect()
+					velTrackConn = nil
+				end
+				velBuffers = {}
 				if cursorRenderConnection then
 					cursorRenderConnection:Disconnect()
 					cursorRenderConnection = nil
@@ -17507,16 +17638,8 @@ run(function()
 
 	local _req = (syn and syn.request) or (http_request and function(t) return http_request(t) end) or request or function() return {Body='{}'} end
 	if not getgenv()._98KA_getBackendUrl then
-		local _cachedUrl
 		getgenv()._98KA_getBackendUrl = function()
-			if _cachedUrl then return _cachedUrl end
-			local ok, res = pcall(function()
-				return _req({Url='https://gist.githubusercontent.com/poopparty/a817668f8805b6d44fa54ff13dc8edf4/raw/url.txt',Method='GET'})
-			end)
-			if ok and res and res.StatusCode == 200 then
-				_cachedUrl = res.Body:match('^%s*(.-)%s*$')
-			end
-			return _cachedUrl
+			return 'http://127.0.0.1:2308'
 		end
 	end
 	local _bu = getgenv()._98KA_getBackendUrl
@@ -17775,12 +17898,7 @@ run(function()
 
 	local _req = (syn and syn.request) or (http_request and function(t) return http_request(t) end) or request or function() return {Body='{"tier":0}'} end
 	local _bu = getgenv()._98KA_getBackendUrl or function()
-		local ok, res = pcall(function()
-			return _req({Url='https://gist.githubusercontent.com/poopparty/a817668f8805b6d44fa54ff13dc8edf4/raw/url.txt',Method='GET'})
-		end)
-		if ok and res and res.StatusCode == 200 then
-			return res.Body:match('^%s*(.-)%s*$')
-		end
+		return 'http://127.0.0.1:2308'
 	end
 
 	local apiClosetNames = {}
