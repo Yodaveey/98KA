@@ -309,31 +309,33 @@ function module.SolveTrajectoryAdvanced(origin, projectileSpeed, gravity, target
 		return module.EulerFallback(origin, projectileSpeed, gravity, targetPos, targetVelocity, targetAccel, playerGravity, playerHeight, params)
 	end
 
-	-- if no acceleration, the quartic result is already optimal
+	-- skip refinement ONLY if no acceleration AND target is grounded
 	local accelMag = targetAccel.Magnitude
-	if accelMag < 0.5 then
+	local isAirborne = math.abs(targetVelocity.Y) > 2
+	if accelMag < 0.5 and not isAirborne then
 		return result
 	end
 
-	-- iterative refinement: re-predict target position accounting for acceleration at estimated flight time
+	-- iterative refinement: re-predict target position accounting for acceleration + gravity at estimated flight time
 	local bestResult = result
 	local bestT = t0 or ((result - origin).Magnitude / projectileSpeed)
 
-	for iter = 1, 5 do
+	for iter = 1, 6 do
 		-- predict where target will be at bestT including acceleration
 		local predPos = targetPos + targetVelocity * bestT + 0.5 * targetAccel * bestT * bestT
 
-		-- apply target gravity for vertical
+		-- apply target gravity for vertical (jump arc / fall)
 		if playerGravity and playerGravity > 0 then
 			local vertY = targetVelocity.Y * bestT - 0.5 * playerGravity * bestT * bestT
 			predPos = Vector3.new(predPos.X, targetPos.Y + vertY, predPos.Z)
 		end
 
-		-- ground clamp the predicted position
+		-- ground clamp: raycast from CURRENT height at predicted X,Z so we don't start underground
 		if params then
+			local rayStartY = math.max(predPos.Y + 8, targetPos.Y + 10)
 			local gRay = workspace:Raycast(
-				Vector3.new(predPos.X, predPos.Y + 8, predPos.Z),
-				Vector3.new(0, -40, 0), params
+				Vector3.new(predPos.X, rayStartY, predPos.Z),
+				Vector3.new(0, -(rayStartY - predPos.Y + 40), 0), params
 			)
 			if gRay then
 				local floorY = gRay.Position.Y + (playerHeight or 3)
@@ -355,7 +357,7 @@ function module.SolveTrajectoryAdvanced(origin, projectileSpeed, gravity, target
 		bestT = newT or ((newResult - origin).Magnitude / projectileSpeed)
 
 		-- converged
-		if math.abs(bestT - prevT) < 0.02 then
+		if math.abs(bestT - prevT) < 0.015 then
 			break
 		end
 	end
