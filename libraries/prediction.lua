@@ -295,6 +295,19 @@ function module.SolveTrajectoryAdvanced(origin, projectileSpeed, gravity, target
 	pingTime = pingTime or 0
 	targetAccel = targetAccel or Vector3.zero
 
+	-- Find the floor level directly below target's CURRENT position
+	-- This gives us the bridge or ground level they are on/above before we predict movement
+	local currentFloorY = nil
+	if params then
+		local gRay = workspace:Raycast(
+			Vector3.new(targetPos.X, targetPos.Y + 3, targetPos.Z),
+			Vector3.new(0, -60, 0), params
+		)
+		if gRay then
+			currentFloorY = gRay.Position.Y + (playerHeight or 3)
+		end
+	end
+
 	-- advance target state by network latency
 	if pingTime > 0.005 then
 		targetPos = targetPos + targetVelocity * pingTime + 0.5 * targetAccel * pingTime * pingTime
@@ -321,16 +334,20 @@ function module.SolveTrajectoryAdvanced(origin, projectileSpeed, gravity, target
 	local bestT = t0 or ((result - origin).Magnitude / projectileSpeed)
 
 	for iter = 1, 6 do
-		-- predict where target will be at bestT including acceleration
-		local predPos = targetPos + targetVelocity * bestT + 0.5 * targetAccel * bestT * bestT
+		-- Predict future position using measured velocity and acceleration.
+		-- Cap downward vertical acceleration spikes to prevent massive overshoots under Roblox network updates
+		local yAccel = targetAccel.Y
+		if yAccel < -80 then
+			yAccel = -80
+		end
+		local predPos = targetPos + targetVelocity * bestT + 0.5 * Vector3.new(targetAccel.X, yAccel, targetAccel.Z) * bestT * bestT
 
-		-- apply target gravity for vertical (jump arc / fall)
-		if playerGravity and playerGravity > 0 then
-			local vertY = targetVelocity.Y * bestT - 0.5 * playerGravity * bestT * bestT
-			predPos = Vector3.new(predPos.X, targetPos.Y + vertY, predPos.Z)
+		-- Clamp to the current floor level if the prediction suggests they will fall through the bridge/ground they are currently above
+		if currentFloorY and predPos.Y < currentFloorY then
+			predPos = Vector3.new(predPos.X, currentFloorY, predPos.Z)
 		end
 
-		-- ground clamp: raycast from CURRENT height at predicted X,Z so we don't start underground
+		-- ground clamp: raycast from above predicted height down for sloped terrain / multi-level bridges
 		if params then
 			local rayStartY = math.max(predPos.Y + 8, targetPos.Y + 10)
 			local gRay = workspace:Raycast(
