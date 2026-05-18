@@ -1609,7 +1609,7 @@ local kitImageIds = {
 	["davey"] = "rbxassetid://9155464612",
 	["warlock"] = "rbxassetid://15186338366",
 	["ember"] = "rbxassetid://9630017904",
-	["black_market_trader"] = "rbxassetid://18922642482",
+	["black_market_trader"] = "rbxassetid://189642482",
 	["yeti"] = "rbxassetid://9166205917",
 	["scarab"] = "rbxassetid://137137517627492",
 	["defender"] = "rbxassetid://131690429591874",
@@ -1621,7 +1621,7 @@ local kitImageIds = {
 	["gun_blade"] = "rbxassetid://138231219644853",
 	["frost_hammer_kit"] = "rbxassetid://11838567073",
 	["spider_queen"] = "rbxassetid://95237509752482",
-	["archer"] = "rbxassetid://9224796984",
+	["archer"] = "rbxassetid://94796984",
 	["axolotl"] = "rbxassetid://9155466713",
 	["baker"] = "rbxassetid://9155463919",
 	["barbarian"] = "rbxassetid://9166207628",
@@ -1637,20 +1637,20 @@ local kitImageIds = {
 	["spirit_gardener"] = "rbxassetid://132108376114488",
 	["hannah"] = "rbxassetid://10726577232",
 	["shielder"] = "rbxassetid://9155464114",
-	["summoner"] = "rbxassetid://18922378956",
+	["summoner"] = "rbxassetid://189378956",
 	["glacial_skater"] = "rbxassetid://84628060516931",
 	["dragon_sword"] = "rbxassetid://16215630104",
 	["lumen"] = "rbxassetid://9630018371",
-	["flower_bee"] = "rbxassetid://101569742252812",
+	["flower_bee"] = "rbxassetid://1015697452812",
 	["jellyfish"] = "rbxassetid://18129974852",
 	["melody"] = "rbxassetid://9155464915",
 	["mimic"] = "rbxassetid://14783283296",
 	["miner"] = "rbxassetid://9166208461",
 	["nazar"] = "rbxassetid://18926951849",
 	["seahorse"] = "rbxassetid://11902552560",
-	["elk_master"] = "rbxassetid://15714972287",
+	["elk_master"] = "rbxassetid://157149787",
 	["rebellion_leader"] = "rbxassetid://18926409564",
-	["void_hunter"] = "rbxassetid://122370766273698",
+	["void_hunter"] = "rbxassetid://1370766273698",
 	["taliyah"] = "rbxassetid://13989437601",
 	["angel"] = "rbxassetid://9166208240",
 	["harpoon"] = "rbxassetid://18250634847",
@@ -1664,12 +1664,12 @@ local kitImageIds = {
 	["dasher"] = "rbxassetid://9155467645",
 	["disruptor"] = "rbxassetid://11596993583",
 	["wizard"] = "rbxassetid://13353923546",
-	["aery"] = "rbxassetid://9155463221",
+	["aery"] = "rbxassetid://91554631",
 	["agni"] = "rbxassetid://17024640133",
 	["alchemist"] = "rbxassetid://9155462512",
 	["spearman"] = "rbxassetid://9166207341",
 	["beekeeper"] = "rbxassetid://9312831285",
-	["falconer"] = "rbxassetid://17022941869",
+	["falconer"] = "rbxassetid://170941869",
 	["bounty_hunter"] = "rbxassetid://9166208649",
 	["blood_assassin"] = "rbxassetid://12520290159",
 	["battery"] = "rbxassetid://10159166528",
@@ -1684,7 +1684,7 @@ local kitImageIds = {
 	["card"] = "rbxassetid://13841410580",
 	["frosty"] = "rbxassetid://9166208762",
 	["gingerbread_man"] = "rbxassetid://9155464364",
-	["ghost_catcher"] = "rbxassetid://9224802656",
+	["ghost_catcher"] = "rbxassetid://94802656",
 	["tinker"] = "rbxassetid://17025762404",
 	["ignis"] = "rbxassetid://13835258938",
 	["oil_man"] = "rbxassetid://9166206259",
@@ -1695,13 +1695,13 @@ local kitImageIds = {
 	["merchant"] = "rbxassetid://9872356790",
 	["metal_detector"] = "rbxassetid://9378298061",
 	["slime_tamer"] = "rbxassetid://15379766168",
-	["nyoka"] = "rbxassetid://17022941410",
+	["nyoka"] = "rbxassetid://170941410",
 	["midnight"] = "rbxassetid://9155462763",
 	["pyro"] = "rbxassetid://9155464770",
 	["raven"] = "rbxassetid://9166206554",
 	["santa"] = "rbxassetid://9166206101",
 	["sheep_herder"] = "rbxassetid://9155465730",
-	["smoke"] = "rbxassetid://9155462247",
+	["smoke"] = "rbxassetid://91554647",
 	["spirit_catcher"] = "rbxassetid://9166207943",
 	["star_collector"] = "rbxassetid://9872356516",
 	["styx"] = "rbxassetid://17014536631",
@@ -6045,8 +6045,8 @@ run(function()
     SwingRange = Killaura:CreateSlider({
         Name = 'Swing range',
         Min = 1,
-        Max = 40, 
-        Default = 22, 
+        Max = 60, 
+        Default = , 
         Suffix = function(val)
             return val == 1 and 'stud' or 'studs'
         end
@@ -6054,8 +6054,8 @@ run(function()
     AttackRange = Killaura:CreateSlider({
         Name = 'Attack range',
         Min = 1,
-        Max = 22,
-        Default = 22, 
+        Max = 40,
+        Default = , 
         Suffix = function(val)
             return val == 1 and 'stud' or 'studs'
         end
@@ -6082,7 +6082,7 @@ run(function()
     UpdateRate = Killaura:CreateSlider({
         Name = 'Update rate',
         Min = 1,
-        Max = 120,
+        Max = 360,
         Default = 60,
         Suffix = 'hz'
     })
@@ -9476,7 +9476,7 @@ run(function()
                     local deviceEmoji = {Mobile = '📱', PC = '🖥', Controller = '🎮', Unknown = '❔'}
                     local deviceLabel = Instance.new('TextLabel')
                     deviceLabel.Name = 'DeviceIcon'
-                    deviceLabel.Size = udim2fromOffset(22, 22)
+                    deviceLabel.Size = udim2fromOffset(, )
                     deviceLabel.Position = udim2fromOffset(size.X + 10, -1)
                     deviceLabel.BackgroundTransparency = 1
                     deviceLabel.BorderSizePixel = 0
@@ -11741,8 +11741,8 @@ run(function()
 								local clawColors = {
 									Color3.fromRGB(75, 75, 75),    
 									Color3.fromRGB(255, 255, 255),  
-									Color3.fromRGB(43, 229, 229),   
-									Color3.fromRGB(49, 229, 94)     
+									Color3.fromRGB(43, 9, 9),   
+									Color3.fromRGB(49, 9, 94)     
 								}
 								local nailMesh = clawModel:FindFirstChild("dragon_claw_nail_mesh")
 								if nailMesh and nailMesh:IsA("MeshPart") then
@@ -12375,7 +12375,7 @@ run(function()
                 end
                 
                 anim = Instance.new("Animation")
-                anim.AnimationId = "rbxassetid://9191822700"
+                anim.AnimationId = "rbxassetid://91918700"
                 anim = humanoid:LoadAnimation(anim)
                 anim:Play()
                 
@@ -13809,7 +13809,7 @@ run(function()
 		if not entitylib.isAlive then return false end
 
 		local pos = entitylib.character.RootPart.Position
-		local maxDistanceSq = 22 * 22
+		local maxDistanceSq =  * 
 
 		for _, chest in pairs(Chests) do
 			if chest.Parent then
@@ -16961,7 +16961,7 @@ run(function()
 		local children = Instance.new('ScrollingFrame')
 		children.Name = 'Children'
 		children.Size = UDim2.fromOffset(500, 240)
-		children.Position = UDim2.fromOffset(144, 122)
+		children.Position = UDim2.fromOffset(144, 1)
 		children.BackgroundTransparency = 1
 		children.BorderSizePixel = 0
 		children.ScrollBarThickness = 2
@@ -17055,7 +17055,7 @@ run(function()
 		}
 		local hotbarlist = Instance.new('TextButton')
 		hotbarlist.Name = 'HotbarList'
-		hotbarlist.Size = UDim2.fromOffset(220, 40)
+		hotbarlist.Size = UDim2.fromOffset(0, 40)
 		hotbarlist.BackgroundColor3 = optionsettings.Darker and (children.BackgroundColor3 == color.Dark(uipallet.Main, 0.02) and color.Dark(uipallet.Main, 0.04) or color.Dark(uipallet.Main, 0.02)) or children.BackgroundColor3
 		hotbarlist.Text = ''
 		hotbarlist.BorderSizePixel = 0
@@ -17113,7 +17113,7 @@ run(function()
 			if vape.ThreadFix then
 				setthreadidentity(8)
 			end
-			hotbarlist.Size = UDim2.fromOffset(220, math.min(43 + windowlist.AbsoluteContentSize.Y / vape.guiscale.Scale, 603))
+			hotbarlist.Size = UDim2.fromOffset(0, math.min(43 + windowlist.AbsoluteContentSize.Y / vape.guiscale.Scale, 603))
 		end)
 		optionapi.Window = CreateWindow(optionapi)
 	
@@ -18032,7 +18032,7 @@ run(function()
 	local lastAttackTime = 0
 	local lastAbilityTime = 0
 	local attackCooldown = 0.65
-	local abilityCooldown = 22
+	local abilityCooldown = 
 	local isChargingAbility = false
 	local currentTarget = nil
 	local AutoStopAbility
@@ -18255,8 +18255,8 @@ run(function()
 											local clawColors = {
 												Color3.fromRGB(75, 75, 75),
 												Color3.fromRGB(255, 255, 255),
-												Color3.fromRGB(43, 229, 229),
-												Color3.fromRGB(49, 229, 94)
+												Color3.fromRGB(43, 9, 9),
+												Color3.fromRGB(49, 9, 94)
 											}
 											local nailMesh = clawModel:FindFirstChild("dragon_claw_nail_mesh")
 											if nailMesh and nailMesh:IsA("MeshPart") then
@@ -18363,7 +18363,7 @@ run(function()
 		Name = 'Attack Range',
 		Min = 1,
 		Max = 32,
-		Default = 22,
+		Default = ,
 		Suffix = function(val)
 			return val == 1 and 'stud' or 'studs'
 		end
@@ -18739,7 +18739,7 @@ run(function()
 										end
 									elseif v.BackgroundColor3 == Color3.fromRGB(255, 102, 204) or 
 										   v.BackgroundColor3 == Color3.fromRGB(255, 85, 255) or 
-										   v.BackgroundColor3 == Color3.fromRGB(218, 133, 222) then
+										   v.BackgroundColor3 == Color3.fromRGB(218, 133, 2) then
 										v.BackgroundColor3 = Color3.fromRGB(15, 185, 55)
 										if v.Parent then
 											for _, sibling in v.Parent:GetChildren() do
@@ -18775,7 +18775,7 @@ run(function()
 									end
 								elseif v.BackgroundColor3 == Color3.fromRGB(255, 102, 204) or 
 									   v.BackgroundColor3 == Color3.fromRGB(255, 85, 255) or 
-									   v.BackgroundColor3 == Color3.fromRGB(218, 133, 222) then
+									   v.BackgroundColor3 == Color3.fromRGB(218, 133, 2) then
 									v.BackgroundColor3 = Color3.fromRGB(15, 185, 55)
 									if v.Parent then
 										for _, sibling in v.Parent:GetChildren() do
@@ -19032,7 +19032,7 @@ run(function()
         elseif teamName:find("blue") then
             return Color3.fromRGB(80, 160, 255)
         elseif teamName:find("yellow") then
-            return Color3.fromRGB(255, 220, 80)
+            return Color3.fromRGB(255, 0, 80)
         end
         return Color3.new(1, 1, 1)
     end
@@ -19106,7 +19106,7 @@ run(function()
         local teamDotColor = getTeamDotColor(plr)
         local clan = getClan(plr)
 
-        local dotPx = DotSizeSlider and DotSizeSlider.Value or 22
+        local dotPx = DotSizeSlider and DotSizeSlider.Value or 
         local dotPos = DotPositionSlider and DotPositionSlider.Value or 0.10
 
         local billui = create("BillboardGui", {
@@ -19303,7 +19303,7 @@ run(function()
         Name = "Dot Size",
         Min = 4,
         Max = 60,
-        Default = 22,
+        Default = ,
         Decimal = 1,
         Suffix = "px",
         Tooltip = "Adjust the size of the colored team dot",
@@ -20280,7 +20280,7 @@ run(function()
                                 bedwars.Client:Get(remotes.PaladinAbilityRequest):SendToServer({})
                                 notif("AutoLani", "used ability on self fr fr", 2)
                             end
-                            task.wait(0.022)
+                            task.wait(0.0)
                             bedwars.AbilityController:useAbility('PALADIN_ABILITY')
                         else
                             notif("AutoLani", "ability on cooldown rn 😭", 2)
@@ -30120,10 +30120,10 @@ run(function()
 		["wool_magenta"] = Color3.fromRGB(255, 50, 150),
 		["wool_lime"] = Color3.fromRGB(150, 255, 50),
 		["wool_brown"] = Color3.fromRGB(150, 75, 0),
-		["wood_plank_spruce"] = Color3.fromRGB(222, 184, 135),
+		["wood_plank_spruce"] = Color3.fromRGB(2, 184, 135),
 		["wool_light_blue"] = Color3.fromRGB(100, 200, 255),
 		["wool_gray"] = Color3.fromRGB(150, 150, 150),
-		["clay"] = Color3.fromRGB(220, 180, 140),
+		["clay"] = Color3.fromRGB(0, 180, 140),
 		["wood"] = Color3.fromRGB(180, 140, 100),
 		["stone"] = Color3.fromRGB(150, 150, 150),
 		["andesite"] = Color3.fromRGB(150, 150, 150),
@@ -30131,8 +30131,8 @@ run(function()
 		["obsidian"] = Color3.fromRGB(50, 30, 80),
 		["bedrock"] = Color3.fromRGB(80, 80, 80),
 		["tnt"] = Color3.fromRGB(255, 50, 50),
-		["sandstone"] = Color3.fromRGB(220, 200, 150),
-		["sand"] = Color3.fromRGB(220, 200, 150),
+		["sandstone"] = Color3.fromRGB(0, 200, 150),
+		["sand"] = Color3.fromRGB(0, 200, 150),
 		["wool"] = Color3.fromRGB(200, 200, 200),
 		["bed"] = Color3.fromRGB(200, 50, 50),
 		["concrete"] = Color3.fromRGB(180, 180, 180),
@@ -32188,8 +32188,8 @@ run(function()
 	Range = AutoEmber:CreateSlider({
 		Name = 'Release Range',
 		Min = 1,
-		Max = 22,
-		Default = 22,
+		Max = ,
+		Default = ,
 		Suffix = function(val)
 			return val <= 1 and 'stud' or 'studs'
 		end
@@ -33281,7 +33281,7 @@ run(function()
 	local mouseIcons = {
 		['CS:GO'] = 'rbxassetid://14789879068',
 		['Old Roblox Mouse'] = 'rbxassetid://13546344315',
-		['dx9ware'] = 'rbxassetid://12233942144',
+		['dx9ware'] = 'rbxassetid://133942144',
 		['Aimbot'] = 'rbxassetid://8680062686',
 		['Triangle'] = 'rbxassetid://14790304072',
 		['Arrow'] = 'rbxassetid://14790316561'
