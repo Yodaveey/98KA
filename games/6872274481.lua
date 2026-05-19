@@ -16446,14 +16446,197 @@ run(function()
 end)
 
 run(function()
-    HitFix = vape.Categories.Legit:CreateModule({
-        Name = 'HitFix',
+	local HitFixHitReg
+	local HitFixHitRegSlider
+	local HitFixSwingFix
+	local HitFixValidation
+	local lastHitFixHitTime = 0
+	local hitFixSwingConn = nil
+	local hitFixOrigAttackSpeed = nil
+	local hitFixOrigConstants = {}
+
+	-- Global hitreg gate — mirrors Killaura's canHitWithCustomReg but independent
+	local function canHitWithHitFixReg()
+		if not HitFixHitReg or not HitFixHitReg.Enabled then return true end
+		if not HitFixHitRegSlider then return true end
+		if HitFixHitRegSlider.Value >= 37 then return true end
+		local currentTime = tick()
+		local delayBetweenHits = 10 / HitFixHitRegSlider.Value
+		if currentTime - lastHitFixHitTime >= delayBetweenHits then
+			lastHitFixHitTime = lastHitFixHitTime + delayBetweenHits
+			if currentTime - lastHitFixHitTime > delayBetweenHits then
+				lastHitFixHitTime = currentTime
+			end
+			return true
+		end
+		return false
+	end
+
+	-- Expose the gate globally so Killaura / other modules can check it
+	store.canHitWithHitFixReg = canHitWithHitFixReg
+
+	HitFix = vape.Categories.Legit:CreateModule({
+		Name = 'HitFix',
 		Function = function(callback)
-			debug.setconstant(bedwars.SwordController.swingSwordAtMouse, 23, callback and 'raycast' or 'Raycast')
-			debug.setupvalue(bedwars.SwordController.swingSwordAtMouse, 4, callback and bedwars.QueryUtil or workspace)
+			-- 1) Original raycast swap — use QueryUtil.raycast instead of workspace:Raycast
+			pcall(function()
+				debug.setconstant(bedwars.SwordController.swingSwordAtMouse, 23, callback and 'raycast' or 'Raycast')
+				debug.setupvalue(bedwars.SwordController.swingSwordAtMouse, 4, callback and bedwars.QueryUtil or workspace)
+			end)
+
+			-- 2) Swing cooldown fix — nuke SwordController cooldowns every heartbeat so attacks never get cd-blocked
+			if callback then
+				if HitFixSwingFix and HitFixSwingFix.Enabled then
+					hitFixSwingConn = runService.Heartbeat:Connect(function()
+						pcall(function()
+							bedwars.SwordController.lastAttack = 0
+							bedwars.SwordController.lastSwing = 0
+							if bedwars.SwordController.lastChargedAttackTimeMap then
+								for k in pairs(bedwars.SwordController.lastChargedAttackTimeMap) do
+									bedwars.SwordController.lastChargedAttackTimeMap[k] = 0
+								end
+							end
+						end)
+					end)
+					HitFix:Clean(hitFixSwingConn)
+				end
+
+				-- 3) Validation fix — patch attack validation constants for more lenient server checks
+				if HitFixValidation and HitFixValidation.Enabled then
+					pcall(function()
+						local swingFunc = bedwars.SwordController.swingSwordAtMouse
+						-- Try to find and patch reach/validation constants
+						-- Store originals for restore
+						for i = 1, 60 do
+							local ok, val = pcall(debug.getconstant, swingFunc, i)
+							if ok and type(val) == 'number' then
+								if val == 14.4 then
+									hitFixOrigConstants[i] = val
+									debug.setconstant(swingFunc, i, 18)
+								elseif val == 20 then
+									hitFixOrigConstants[i] = val
+									debug.setconstant(swingFunc, i, 24)
+								end
+							end
+						end
+					end)
+				end
+
+				-- Reset hitreg timer
+				lastHitFixHitTime = 0
+			else
+				-- Disable: disconnect swing fix
+				if hitFixSwingConn then
+					hitFixSwingConn:Disconnect()
+					hitFixSwingConn = nil
+				end
+
+				-- Restore patched constants
+				pcall(function()
+					local swingFunc = bedwars.SwordController.swingSwordAtMouse
+					for i, origVal in pairs(hitFixOrigConstants) do
+						pcall(debug.setconstant, swingFunc, i, origVal)
+					end
+					table.clear(hitFixOrigConstants)
+				end)
+			end
 		end,
-		Tooltip = 'Changes the raycast function to the correct one'
+		Tooltip = 'Improves hit registration: fixes raycast, removes swing cooldowns, patches validation, and adds custom hitreg control'
 	})
+
+	HitFixHitReg = HitFix:CreateToggle({
+		Name = 'Custom HitReg',
+		Tooltip = 'Limit how many hits register per 10 seconds (like KA hitreg but global)',
+		Function = function(callback)
+			if HitFixHitRegSlider then
+				HitFixHitRegSlider.Object.Visible = callback
+			end
+			if callback then
+				lastHitFixHitTime = 0
+			end
+		end
+	})
+
+	HitFixHitRegSlider = HitFix:CreateSlider({
+		Name = 'Hits Per 10s',
+		Min = 1,
+		Max = 37,
+		Default = 34,
+		Tooltip = 'Max hits per 10 seconds. 34 = normal, 36 = swing only + 120hz, 37 = uncapped',
+		Visible = false
+	})
+
+	HitFixSwingFix = HitFix:CreateToggle({
+		Name = 'Swing Cooldown Fix',
+		Default = true,
+		Tooltip = 'Removes sword swing cooldowns so attacks are never blocked by cd timers',
+		Function = function(callback)
+			if HitFix.Enabled then
+				-- Re-toggle to apply/remove the heartbeat connection
+				if callback then
+					if hitFixSwingConn then hitFixSwingConn:Disconnect() end
+					hitFixSwingConn = runService.Heartbeat:Connect(function()
+						pcall(function()
+							bedwars.SwordController.lastAttack = 0
+							bedwars.SwordController.lastSwing = 0
+							if bedwars.SwordController.lastChargedAttackTimeMap then
+								for k in pairs(bedwars.SwordController.lastChargedAttackTimeMap) do
+									bedwars.SwordController.lastChargedAttackTimeMap[k] = 0
+								end
+							end
+						end)
+					end)
+					HitFix:Clean(hitFixSwingConn)
+				else
+					if hitFixSwingConn then
+						hitFixSwingConn:Disconnect()
+						hitFixSwingConn = nil
+					end
+				end
+			end
+		end
+	})
+
+	HitFixValidation = HitFix:CreateToggle({
+		Name = 'Validation Fix',
+		Default = false,
+		Tooltip = 'Patches attack validation constants for more lenient hit checks (reach tolerance)',
+		Function = function(callback)
+			if HitFix.Enabled then
+				if callback then
+					pcall(function()
+						local swingFunc = bedwars.SwordController.swingSwordAtMouse
+						for i = 1, 60 do
+							local ok, val = pcall(debug.getconstant, swingFunc, i)
+							if ok and type(val) == 'number' then
+								if val == 14.4 then
+									hitFixOrigConstants[i] = val
+									debug.setconstant(swingFunc, i, 18)
+								elseif val == 20 then
+									hitFixOrigConstants[i] = val
+									debug.setconstant(swingFunc, i, 24)
+								end
+							end
+						end
+					end)
+				else
+					pcall(function()
+						local swingFunc = bedwars.SwordController.swingSwordAtMouse
+						for i, origVal in pairs(hitFixOrigConstants) do
+							pcall(debug.setconstant, swingFunc, i, origVal)
+						end
+						table.clear(hitFixOrigConstants)
+					end)
+				end
+			end
+		end
+	})
+
+	task.defer(function()
+		if HitFixHitRegSlider and HitFixHitRegSlider.Object then
+			HitFixHitRegSlider.Object.Visible = HitFixHitReg and HitFixHitReg.Enabled or false
+		end
+	end)
 end)
 
 run(function()
