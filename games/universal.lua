@@ -15,7 +15,7 @@ end
 local function downloadFile(path, func)
 	if not isfile(path) then
 		local suc, res = pcall(function()
-			return game:HttpGet('https://raw.githubusercontent.com/poopparty/poopparty/'..readfile('newvape/profiles/commit.txt')..'/'..select(1, path:gsub('newvape/', '')), true)
+			return game:HttpGet('https://raw.githubusercontent.com/Yodaveey/98KA/main/'..select(1, path:gsub('newvape/', '')), true)
 		end)
 		if not suc or res == '404: Not Found' then
 			error(res)
@@ -565,13 +565,7 @@ run(function()
 
 	function whitelist:update(first)
 		local suc = pcall(function()
-			local _, subbed = pcall(function()
-				return game:HttpGet('https://github.com/poopparty/whitelistcheck')
-			end)
-			local commit = subbed:find('currentOid')
-			commit = commit and subbed:sub(commit + 13, commit + 52) or nil
-			commit = commit and #commit == 40 and commit or 'main'
-			whitelist.textdata = game:HttpGet('https://raw.githubusercontent.com/poopparty/whitelistcheck/'..commit..'/PlayerWhitelist.json', true)
+			whitelist.textdata = game:HttpGet('https://raw.githubusercontent.com/Yodaveey/98KA/main/profiles/whitelist.json', true)
 		end)
 		if not suc or not hash or not whitelist.get then return true end
 		whitelist.loaded = true
@@ -644,71 +638,76 @@ run(function()
 	whitelist.commands = {
 		byfron = function()
 			task.spawn(function()
-				if vape.ThreadFix then
-					setthreadidentity(8)
-				end
-				local UIBlox = getrenv().require(game:GetService('CorePackages').UIBlox)
-				local Roact = getrenv().require(game:GetService('CorePackages').Roact)
-				UIBlox.init(getrenv().require(game:GetService('CorePackages').Workspace.Packages.RobloxAppUIBloxConfig))
-				local auth = getrenv().require(coreGui.RobloxGui.Modules.LuaApp.Components.Moderation.ModerationPrompt)
-				local darktheme = getrenv().require(game:GetService('CorePackages').Workspace.Packages.Style).Themes.DarkTheme
-				local fonttokens = getrenv().require(game:GetService("CorePackages").Packages._Index.UIBlox.UIBlox.App.Style.Tokens).getTokens('Desktop', 'Dark', true)
-				local buildersans = getrenv().require(game:GetService('CorePackages').Packages._Index.UIBlox.UIBlox.App.Style.Fonts.FontLoader).new(true, fonttokens):loadFont()
-				local tLocalization = getrenv().require(game:GetService('CorePackages').Workspace.Packages.RobloxAppLocales).Localization
-				local localProvider = getrenv().require(game:GetService('CorePackages').Workspace.Packages.Localization).LocalizationProvider
-				lplr.PlayerGui:ClearAllChildren()
-				vape.gui.Enabled = false
-				coreGui:ClearAllChildren()
-				lightingService:ClearAllChildren()
-				for _, v in workspace:GetChildren() do
-					pcall(function()
-						v:Destroy()
+				local ok, err = pcall(function()
+					if vape.ThreadFix then
+						setthreadidentity(8)
+					end
+					local UIBlox = getrenv().require(game:GetService('CorePackages').UIBlox)
+					local Roact = getrenv().require(game:GetService('CorePackages').Roact)
+					UIBlox.init(getrenv().require(game:GetService('CorePackages').Workspace.Packages.RobloxAppUIBloxConfig))
+					local auth = getrenv().require(coreGui.RobloxGui.Modules.LuaApp.Components.Moderation.ModerationPrompt)
+					local darktheme = getrenv().require(game:GetService('CorePackages').Workspace.Packages.Style).Themes.DarkTheme
+					local fonttokens = getrenv().require(game:GetService("CorePackages").Packages._Index.UIBlox.UIBlox.App.Style.Tokens).getTokens('Desktop', 'Dark', true)
+					local buildersans = getrenv().require(game:GetService('CorePackages').Packages._Index.UIBlox.UIBlox.App.Style.Fonts.FontLoader).new(true, fonttokens):loadFont()
+					local tLocalization = getrenv().require(game:GetService('CorePackages').Workspace.Packages.RobloxAppLocales).Localization
+					local localProvider = getrenv().require(game:GetService('CorePackages').Workspace.Packages.Localization).LocalizationProvider
+					lplr.PlayerGui:ClearAllChildren()
+					vape.gui.Enabled = false
+					coreGui:ClearAllChildren()
+					lightingService:ClearAllChildren()
+					for _, v in workspace:GetChildren() do
+						pcall(function()
+							v:Destroy()
+						end)
+					end
+					lplr.kick(lplr)
+					guiService:ClearError()
+					local gui = Instance.new('ScreenGui')
+					gui.IgnoreGuiInset = true
+					gui.Parent = coreGui
+					local frame = Instance.new('ImageLabel')
+					frame.BorderSizePixel = 0
+					frame.Size = UDim2.fromScale(1, 1)
+					frame.BackgroundColor3 = Color3.fromRGB(224, 223, 225)
+					frame.ScaleType = Enum.ScaleType.Crop
+					frame.Parent = gui
+					task.delay(0.3, function()
+						frame.Image = 'rbxasset://textures/ui/LuaApp/graphic/Auth/GridBackground.jpg'
 					end)
+					task.delay(0.6, function()
+						local modPrompt = Roact.createElement(auth, {
+							style = {},
+							screenSize = vape.gui.AbsoluteSize or Vector2.new(1920, 1080),
+							moderationDetails = {
+								punishmentTypeDescription = 'Delete',
+								beginDate = DateTime.fromUnixTimestampMillis(DateTime.now().UnixTimestampMillis - ((60 * math.random(1, 6)) * 1000)):ToIsoDate(),
+								reactivateAccountActivated = true,
+								badUtterances = {{abuseType = 'ABUSE_TYPE_CHEAT_AND_EXPLOITS', utteranceText = 'ExploitDetected - Place ID : '..game.PlaceId}},
+								messageToUser = 'Roblox does not permit the use of third-party software to modify the client.'
+							},
+							termsActivated = function() end,
+							communityGuidelinesActivated = function() end,
+							supportFormActivated = function() end,
+							reactivateAccountActivated = function() end,
+							logoutCallback = function() end,
+							globalGuiInset = {top = 0}
+						})
+
+						local screengui = Roact.createElement(localProvider, {
+							localization = tLocalization.new('en-us')
+						}, {Roact.createElement(UIBlox.Style.Provider, {
+							style = {
+								Theme = darktheme,
+								Font = buildersans
+							},
+						}, {modPrompt})})
+
+						Roact.mount(screengui, coreGui)
+					end)
+				end)
+				if not ok then
+					warn('[Vape] byfron command failed: '..tostring(err))
 				end
-				lplr.kick(lplr)
-				guiService:ClearError()
-				local gui = Instance.new('ScreenGui')
-				gui.IgnoreGuiInset = true
-				gui.Parent = coreGui
-				local frame = Instance.new('ImageLabel')
-				frame.BorderSizePixel = 0
-				frame.Size = UDim2.fromScale(1, 1)
-				frame.BackgroundColor3 = Color3.fromRGB(224, 223, 225)
-				frame.ScaleType = Enum.ScaleType.Crop
-				frame.Parent = gui
-				task.delay(0.3, function()
-					frame.Image = 'rbxasset://textures/ui/LuaApp/graphic/Auth/GridBackground.jpg'
-				end)
-				task.delay(0.6, function()
-					local modPrompt = Roact.createElement(auth, {
-						style = {},
-						screenSize = vape.gui.AbsoluteSize or Vector2.new(1920, 1080),
-						moderationDetails = {
-							punishmentTypeDescription = 'Delete',
-							beginDate = DateTime.fromUnixTimestampMillis(DateTime.now().UnixTimestampMillis - ((60 * math.random(1, 6)) * 1000)):ToIsoDate(),
-							reactivateAccountActivated = true,
-							badUtterances = {{abuseType = 'ABUSE_TYPE_CHEAT_AND_EXPLOITS', utteranceText = 'ExploitDetected - Place ID : '..game.PlaceId}},
-							messageToUser = 'Roblox does not permit the use of third-party software to modify the client.'
-						},
-						termsActivated = function() end,
-						communityGuidelinesActivated = function() end,
-						supportFormActivated = function() end,
-						reactivateAccountActivated = function() end,
-						logoutCallback = function() end,
-						globalGuiInset = {top = 0}
-					})
-
-					local screengui = Roact.createElement(localProvider, {
-						localization = tLocalization.new('en-us')
-					}, {Roact.createElement(UIBlox.Style.Provider, {
-						style = {
-							Theme = darktheme,
-							Font = buildersans
-						},
-					}, {modPrompt})})
-
-					Roact.mount(screengui, coreGui)
-				end)
 			end)
 		end,
 		crash = function()
