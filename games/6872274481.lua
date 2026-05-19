@@ -16446,6 +16446,7 @@ run(function()
 end)
 
 run(function()
+	local HitFix
 	local HitFixHitReg
 	local HitFixHitRegSlider
 	local HitFixSwingFix
