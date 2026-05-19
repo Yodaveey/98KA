@@ -7298,7 +7298,7 @@ run(function()
 				if p then return p:GetValue() / 1000 end
 			end
 			-- fallback
-			return (lplr:GetNetworkPing()) / 1000
+			return lplr:GetNetworkPing()
 		end)
 		if ok and type(ping) == 'number' and ping > 0 then
 			return math_clamp(ping, 0, 0.3)
