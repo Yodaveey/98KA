@@ -6045,7 +6045,7 @@ run(function()
     SwingRange = Killaura:CreateSlider({
         Name = 'Swing range',
         Min = 1,
-        Max = 60, 
+        Max = 50, 
         Default = , 
         Suffix = function(val)
             return val == 1 and 'stud' or 'studs'
@@ -6054,7 +6054,7 @@ run(function()
     AttackRange = Killaura:CreateSlider({
         Name = 'Attack range',
         Min = 1,
-        Max = 40,
+        Max = 50,
         Default = , 
         Suffix = function(val)
             return val == 1 and 'stud' or 'studs'
@@ -6089,7 +6089,7 @@ run(function()
     MaxTargets = Killaura:CreateSlider({
         Name = 'Max targets',
         Min = 1,
-        Max = 5,
+        Max = 10,
         Default = 5
     })
     Sort = Killaura:CreateDropdown({
@@ -6134,7 +6134,7 @@ run(function()
     ContinueSwingTime = Killaura:CreateSlider({
         Name = 'Swing Duration',
         Min = 0,  
-        Max = 5,  
+        Max = 7,  
         Default = 1,
         Decimal = 10,
         Suffix = 's',
@@ -6378,7 +6378,7 @@ run(function()
     AirHit = Killaura:CreateToggle({
         Name = 'Air Hits',
         Default = true,
-        Tooltip = 'Control hit chance when target is airborne',
+        Tooltip = 'Control hit chance when target is in air',
         Function = function(callback)
             if AirHitsChance then
                 AirHitsChance.Object.Visible = callback
@@ -6428,7 +6428,7 @@ run(function()
 
 	FastHits = Killaura:CreateToggle({
         Name = 'Fast Hits',
-        Tooltip = 'Deals more damage quicker using projectiles',
+        Tooltip = 'lowers projectile cooldown ',
         Default = false,
         Function = function(call)
             FastHitsMode.Object.Visible = call
