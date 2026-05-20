@@ -7998,19 +7998,19 @@ run(function()
 						elseif typeof(bedwars.ShopTaxController.hasTax) == "boolean" then
 							bedwars.ShopTaxController.hasTax = false
 						else
-							vape:CreateNotification('TaxRemover',`Tax Remover error the type of hasTax is {typeof(bedwars.ShopTaxController.hasTax)} report to 98KA or soryed`,16,'alert')
+							vape:CreateNotification('TaxRemover',`Tax Remover error the type of hasTax is {typeof(bedwars.ShopTaxController.hasTax)} report to Kingify or sky`,16,'alert')
 							break
 						end
 						if typeof(bedwars.ShopTaxController.taxedItems) == "table" then
 							bedwars.ShopTaxController.taxedItems = {}
 						else
-							vape:CreateNotification('TaxRemover',`Tax Remover error the type of taxedItems is NOT a TABLE PLEASE report to 98KA or soryed ASAP`,16,'alert')
+							vape:CreateNotification('TaxRemover',`Tax Remover error the type of taxedItems is NOT a TABLE PLEASE report to Kingify or Sky ASAP`,16,'alert')
 							break
 						end
 						if typeof(bedwars.ShopTaxController.addedTaxMap) == "table" then
 							bedwars.ShopTaxController.addedTaxMap = {}
 						else
-							vape:CreateNotification('TaxRemover',`Tax Remover error the type of addedTaxMap is NOT a TABLE PLEASE report to 98KA or soryed ASAP`,16,'alert')
+							vape:CreateNotification('TaxRemover',`Tax Remover error the type of addedTaxMap is NOT a TABLE PLEASE report to Kingify or sky ASAP`,16,'alert')
 							break
 						end
 						task.wait()
@@ -31365,7 +31365,7 @@ run(function()
 		elseif Mode.Value == 'Camera' then
 			targetPos = gameCamera.CFrame.Position + gameCamera.CFrame.LookVector * 200
 		else
-			vape:CreateNotification('MouseTP', 'Mode is currently nil. Report to 98KA or soryed', 6, 'warning')
+			vape:CreateNotification('MouseTP', 'Mode is currently nil. Report to Kingify or Sky', 6, 'warning')
 			return
 		end
 
@@ -31416,7 +31416,7 @@ run(function()
 				)
 			end
 		else
-			vape:CreateNotification('MouseTP', 'Movement is currently nil. Report to 98KA or soryed', 6, 'warning')
+			vape:CreateNotification('MouseTP', 'Movement is currently nil. Report to Kingify or Sky', 6, 'warning')
 			return
 		end
 	end
