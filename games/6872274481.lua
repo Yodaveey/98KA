@@ -16106,7 +16106,7 @@ run(function()
 								end
 							end
 							if foundYeti then continue end
-					if UseLookAt and UseLookAt.Enabled then
+					if UseLookAt and UseLookAt.Enabled and getLookAtBlock then
 						local targetBlock = getLookAtBlock()
 						if targetBlock and targetBlock.Parent then
 							local dist = (targetBlock.Position - localPosition).Magnitude
