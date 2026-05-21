@@ -16317,18 +16317,12 @@ run(function()
 	})
 	UseLookAt = Breaker:CreateToggle({
 		Name = 'Look At Block',
-		Tooltip = 'Prioritize the block you are looking at',
-		Function = function(callback)
-			if LookAtMode then
-				LookAtMode.Object.Visible = callback
-			end
-		end
+		Tooltip = 'Break the block you are looking at'
 	})
 	LookAtMode = Breaker:CreateDropdown({
 		Name = 'Look Mode',
 		List = {'Cursor', 'Character'},
 		Default = 'Cursor',
-		Visible = false,
 		Tooltip = 'Choose whether to target using the cursor or character facing'
 	})
 	YetiBreaker = Breaker:CreateToggle({
