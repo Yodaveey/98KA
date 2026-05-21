@@ -1783,6 +1783,43 @@ local function cloneRaycast()
     return r
 end
 
+local function getLookAtBlock()
+    if not entitylib.isAlive then return nil end
+
+    local origin, direction
+    if LookAtMode and LookAtMode.Value == 'Character' then
+        local root = entitylib.character.RootPart
+        if not root then return nil end
+        origin = root.Position + Vector3.new(0, root.Size.Y * 0.5, 0)
+        direction = root.CFrame.LookVector
+    else
+        local mouseLocation = inputService:GetMouseLocation()
+        local ray = gameCamera:ViewportPointToRay(mouseLocation.X, mouseLocation.Y)
+        origin = ray.Origin
+        direction = ray.Direction
+    end
+
+    local params = cloneRaycast()
+    params.FilterType = Enum.RaycastFilterType.Exclude
+    params.FilterDescendantsInstances = {}
+    for _, player in pairs(playersService:GetPlayers()) do
+        if player.Character then
+            table.insert(params.FilterDescendantsInstances, player.Character)
+        end
+    end
+    params.RespectCanCollide = true
+
+    local result = workspace:Raycast(origin, direction * (Range and Range.Value or 30), params)
+    if not result or not result.Instance then return nil end
+
+    local block = getPlacedBlock(result.Position)
+    if block then return block end
+    if result.Instance:IsA('BasePart') then
+        return getPlacedBlock(result.Instance.Position)
+    end
+    return nil
+end
+
 local function isSword()
     return store.hand and store.hand.toolType == 'sword'
 end
@@ -15750,6 +15787,17 @@ run(function()
 			lastTier4Break = tick() 
 		end
 
+		local myTeam = (lplr.Character and (lplr.Character:GetAttribute('Team') or lplr.Character:GetAttribute('TeamId') or lplr.Character:GetAttribute('TeamID'))) or lplr:GetAttribute('Team') or lplr:GetAttribute('TeamId') or lplr:GetAttribute('TeamID')
+		if (v.Name == 'bed' or collectionService:HasTag(v, 'bed') or (v.Parent and collectionService:HasTag(v.Parent, 'bed'))) then
+			local bedTeam = v:GetAttribute('Team') or v:GetAttribute('TeamId') or v:GetAttribute('TeamID')
+			if not bedTeam and v.Parent then
+				bedTeam = v.Parent:GetAttribute('Team') or v.Parent:GetAttribute('TeamId') or v.Parent:GetAttribute('TeamID')
+			end
+			if myTeam and bedTeam and tonumber(bedTeam) == tonumber(myTeam) then
+				return false
+			end
+		end
+
 		if not SelfBreak.Enabled then
 			if v.Name == 'bed' then
 				local myTeam = lplr.Character and (lplr.Character:GetAttribute('Team') or lplr.Character:GetAttribute('TeamId'))
@@ -16058,6 +16106,22 @@ run(function()
 								end
 							end
 							if foundYeti then continue end
+					if UseLookAt and UseLookAt.Enabled then
+						local targetBlock = getLookAtBlock()
+						if targetBlock and targetBlock.Parent then
+							local dist = (targetBlock.Position - localPosition).Magnitude
+							if dist <= Range.Value and passesChecks(targetBlock) then
+								local blockPos = bedwars.BlockController:getBlockPosition(targetBlock.Position)
+								local ok, canBreak = pcall(bedwars.BlockController.isBlockBreakable, bedwars.BlockController, {blockPosition = blockPos}, lplr)
+								if ok and canBreak then
+									if not MouseDown or not MouseDown.Enabled or inputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+										doBreak(targetBlock)
+										continue
+									end
+								end
+							end
+						end
+					end
 						end
 
 						local best, bestDist = nil, math.huge
@@ -16250,6 +16314,22 @@ run(function()
 	MouseDown = Breaker:CreateToggle({
 		Name = 'Require Mouse Down',
 		Tooltip = 'Only breaks blocks when holding left click'
+	})
+	UseLookAt = Breaker:CreateToggle({
+		Name = 'Look At Block',
+		Tooltip = 'Prioritize the block you are looking at',
+		Function = function(callback)
+			if LookAtMode then
+				LookAtMode.Object.Visible = callback
+			end
+		end
+	})
+	LookAtMode = Breaker:CreateDropdown({
+		Name = 'Look Mode',
+		List = {'Cursor', 'Character'},
+		Default = 'Cursor',
+		Visible = false,
+		Tooltip = 'Choose whether to target using the cursor or character facing'
 	})
 	YetiBreaker = Breaker:CreateToggle({
 		Name = 'Yeti Breaker',
