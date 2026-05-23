@@ -579,7 +579,7 @@ run(function()
 				return httpService:JSONDecode(whitelist.textdata)
 			end)
 
-			whitelist.data = suc and type(res) == 'table' and res or whitelist.data
+			whitelist.data = (suc and type(res) == 'table' and res) or (whitelist.data or {})
 			whitelist.localprio = whitelist:get(lplr)
 
 			for _, v in whitelist.data.WhitelistedUsers do
