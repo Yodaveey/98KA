@@ -8455,6 +8455,191 @@ run(function()
         Tooltip = 'Control bow charge percentage (affects damage): 100% = full damage, 50% = half damage, etc.'
     })
 end)
+
+run(function()
+	local CollectAll
+	local CollectStars
+	local CollectMetal
+	local CollectElder
+	local CollectRange
+	local AutoConsume
+	local ConsumeDelay
+
+	local function getItemFromInventory(itemName)
+		local inventoriesFolder = replicatedStorage:FindFirstChild("Inventories")
+		if not inventoriesFolder then return nil end
+		
+		local playerFolder = inventoriesFolder:FindFirstChild(lplr.Name)
+		if not playerFolder then return nil end
+		
+		local item = playerFolder:FindFirstChild(itemName)
+		return item
+	end
+
+	local function consumeItem(itemName)
+		if not AutoConsume.Enabled then return end
+		
+		task.wait(ConsumeDelay.Value / 1000)
+		
+		local item = getItemFromInventory(itemName)
+		if item then
+			pcall(function()
+				replicatedStorage:WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("ConsumeItem"):InvokeServer({
+					item = item
+				})
+			end)
+		end
+	end
+
+	local function collectItemsOfType(collectableNames, itemTypeNames)
+		if not entitylib.isAlive then return end
+		
+		local myPos = entitylib.character.RootPart.Position
+		local range = CollectRange.Value
+		local collected = 0
+		
+		for _, obj in workspace:GetDescendants() do
+			if not CollectAll.Enabled then break end
+			
+			if not obj:IsA('Model') and not obj:IsA('BasePart') then continue end
+			
+			local collectableName = obj.Name
+			local collectableId = obj:GetAttribute('Id')
+			
+			if not collectableId then continue end
+			
+			local found = false
+			for _, name in ipairs(collectableNames) do
+				if collectableName:lower():find(name, 1, true) then
+					found = true
+					break
+				end
+			end
+			
+			if not found then continue end
+			
+			local part = obj:IsA('BasePart') and obj or (obj.PrimaryPart or obj:FindFirstChildOfClass('BasePart'))
+			if not part then continue end
+			
+			if (part.Position - myPos).Magnitude <= range then
+				pcall(function()
+					replicatedStorage:WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("CollectCollectableEntity"):FireServer({
+						id = collectableId,
+						collectableName = collectableName
+					})
+					collected = collected + 1
+					
+					if AutoConsume.Enabled then
+						for _, itemType in ipairs(itemTypeNames) do
+							consumeItem(itemType)
+						end
+					end
+				end)
+				task.wait(0.05)
+			end
+		end
+		
+		return collected
+	end
+
+	CollectAll = vape.Categories.Utility:CreateModule({
+		Name = 'CollectAll',
+		Function = function(callback)
+			if callback then
+				local loopThread = nil
+				loopThread = task.spawn(function()
+					while CollectAll.Enabled do
+						if entitylib.isAlive then
+							local itemsToCollect = {}
+							local itemTypes = {}
+							
+							if CollectStars.Enabled then
+								table.insert(itemsToCollect, 'star')
+								table.insert(itemTypes, 'vitality_star')
+								table.insert(itemTypes, 'crit_star')
+							end
+							if CollectMetal.Enabled then
+								table.insert(itemsToCollect, 'metal')
+								table.insert(itemsToCollect, 'hidden')
+								table.insert(itemTypes, 'metal')
+								table.insert(itemTypes, 'hidden_metal')
+							end
+							if CollectElder.Enabled then
+								table.insert(itemsToCollect, 'orb')
+								table.insert(itemsToCollect, 'shadow')
+								table.insert(itemsToCollect, 'elder')
+								table.insert(itemTypes, 'elder_orb')
+								table.insert(itemTypes, 'shadow_coin')
+							end
+							
+							if #itemsToCollect > 0 then
+								collectItemsOfType(itemsToCollect, itemTypes)
+							end
+						end
+						task.wait(0.15)
+					end
+				end)
+				CollectAll:Clean(function() if loopThread then task.cancel(loopThread) end end)
+			end
+		end,
+		Tooltip = 'Collect and optionally consume nearby items automatically'
+	})
+
+	CollectStars = CollectAll:CreateToggle({
+		Name = 'Collect Stars',
+		Default = false,
+		Tooltip = 'Collects vitality stars and crit stars'
+	})
+
+	CollectMetal = CollectAll:CreateToggle({
+		Name = 'Collect Metal',
+		Default = false,
+		Tooltip = 'Collects metal and hidden metal'
+	})
+
+	CollectElder = CollectAll:CreateToggle({
+		Name = 'Collect Elder',
+		Default = false,
+		Tooltip = 'Collects elder orbs and shadow coins'
+	})
+
+	CollectRange = CollectAll:CreateSlider({
+		Name = 'Collection Range',
+		Min = 5,
+		Max = 100,
+		Default = 30,
+		Suffix = function(val)
+			return val == 1 and 'stud' or 'studs'
+		end,
+		Tooltip = 'How far away items are collected from'
+	})
+
+	AutoConsume = CollectAll:CreateToggle({
+		Name = 'Auto Consume',
+		Default = false,
+		Tooltip = 'Automatically use collected items after picking them up',
+		Function = function(callback)
+			if ConsumeDelay then ConsumeDelay.Object.Visible = callback end
+		end
+	})
+
+	ConsumeDelay = CollectAll:CreateSlider({
+		Name = 'Consume Delay',
+		Min = 0,
+		Max = 1000,
+		Default = 100,
+		Decimal = 100,
+		Suffix = 'ms',
+		Visible = false,
+		Tooltip = 'Delay before consuming collected item'
+	})
+
+	task.defer(function()
+		if ConsumeDelay and ConsumeDelay.Object then
+			ConsumeDelay.Object.Visible = AutoConsume and AutoConsume.Enabled
+		end
+	end)
+end)
 	
 run(function()
 	local BedESP
