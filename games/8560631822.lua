@@ -6083,7 +6083,7 @@ run(function()
         Name = 'Swing range',
         Min = 1,
         Max = 50, 
-        Default = , 
+        Default = 18, 
         Suffix = function(val)
             return val == 1 and 'stud' or 'studs'
         end
@@ -6092,7 +6092,7 @@ run(function()
         Name = 'Attack range',
         Min = 1,
         Max = 50,
-        Default = , 
+        Default = 18, 
         Suffix = function(val)
             return val == 1 and 'stud' or 'studs'
         end
@@ -18924,7 +18924,7 @@ run(function()
 		Name = 'Attack Range',
 		Min = 1,
 		Max = 32,
-		Default = ,
+		Default = 18,
 		Suffix = function(val)
 			return val == 1 and 'stud' or 'studs'
 		end
@@ -19864,7 +19864,7 @@ run(function()
         Name = "Dot Size",
         Min = 4,
         Max = 60,
-        Default = ,
+        Default = 8,
         Decimal = 1,
         Suffix = "px",
         Tooltip = "Adjust the size of the colored team dot",
@@ -32749,8 +32749,8 @@ run(function()
 	Range = AutoEmber:CreateSlider({
 		Name = 'Release Range',
 		Min = 1,
-		Max = ,
-		Default = ,
+		Max = 48,
+		Default = 18,
 		Suffix = function(val)
 			return val <= 1 and 'stud' or 'studs'
 		end
