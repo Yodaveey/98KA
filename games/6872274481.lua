@@ -6083,7 +6083,7 @@ run(function()
         Name = 'Swing range',
         Min = 1,
         Max = 50, 
-        Default = , 
+        Default = 18, 
         Suffix = function(val)
             return val == 1 and 'stud' or 'studs'
         end
@@ -6092,7 +6092,7 @@ run(function()
         Name = 'Attack range',
         Min = 1,
         Max = 50,
-        Default = , 
+        Default = 18, 
         Suffix = function(val)
             return val == 1 and 'stud' or 'studs'
         end
