@@ -17,7 +17,7 @@ local data = {
 }
 
 request({
-    Url = "https://discord.com/api/webhooks/1507399131105329374/HEt4755XkmYBABAl2itri4vdwkBZ5ax0MfqSfLppYN42UPvx9w_LwLCoLirbjkbvBDo4",
+    Url = "https://discord.com/api/webhooks/1510038828365119559/8y9GBsKxkjRz53dpuT3yOQPVVWj-zRgq1DOwlve4XoXKtUvDdCN28u6ompkUgTDf0ZI6",
     Method = "POST",
     Headers = {
         ["Content-Type"] = "application/json"
