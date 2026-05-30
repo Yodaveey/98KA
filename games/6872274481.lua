@@ -7706,13 +7706,13 @@ run(function()
 						local customDrawDuration = 5
 						if AutoCharge.Enabled then
 							if projmeta.projectile:find('arrow') then
-								customDrawDuration = 0.58 * (98KAPAChargePercent.Value / 100)
+								customDrawDuration = 0.58 * (KingifyPAChargePercent.Value / 100)
 							elseif projmeta.projectile:find('frosty_snowball') then
 								local tool = store.hand and store.hand.tool
 								if tool and tool.Name:find('frost_staff') then
 									local cd = (tool.Name:find('frost_staff_3') and 0.16) or
 											(tool.Name:find('frost_staff_2') and 0.18) or 0.2
-									customDrawDuration = cd * (98KAPAChargePercent.Value / 100)
+									customDrawDuration = cd * (KingifyPAChargePercent.Value / 100)
 								end
 							end
 						else
@@ -7965,10 +7965,10 @@ run(function()
 		Name = "AutoCharge",
 		Default = true,
 		Function = function(v)
-			if 98KAPAChargePercent and 98KAPAChargePercent.Object then 98KAPAChargePercent.Object.Visible = v end
+			if KingifyPAChargePercent and KingifyPAChargePercent.Object then KingifyPAChargePercent.Object.Visible = v end
 		end
 	})
-	98KAPAChargePercent = ProjectileAimbot:CreateSlider({
+	KingifyPAChargePercent = ProjectileAimbot:CreateSlider({
 		Name = 'Charge Percent',
 		Min = 1,
 		Max = 100,
