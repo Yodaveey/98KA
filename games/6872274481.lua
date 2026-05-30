@@ -7222,11 +7222,11 @@ run(function()
 	local CustomPrediction
 	local HorizontalMultiplier
 	local VerticalMultiplier
-	local DesirePAWorkMode
-	local DesirePAHideCursor
-	local DesirePACursorViewMode
-	local DesirePACursorLimitBow
-	local DesirePACursorShowGUI
+	local KingifyPAWorkMode
+	local KingifyPAHideCursor
+	local KingifyPACursorViewMode
+	local KingifyPACursorLimitBow
+	local KingifyPACursorShowGUI
 	local cursorRenderConnection
 	local lastGUIState = false
 	local rayCheck = cloneRaycast()
@@ -7406,13 +7406,13 @@ run(function()
 	end
 
 	local function shouldHideCursor()
-		if not DesirePAHideCursor or not DesirePAHideCursor.Enabled then return false end
-		if DesirePACursorShowGUI and DesirePACursorShowGUI.Enabled and isGUIOpen() then return false end
-		if DesirePACursorLimitBow and DesirePACursorLimitBow.Enabled and not hasBowEquipped() then return false end
+		if not KingifyPAHideCursor or not KingifyPAHideCursor.Enabled then return false end
+		if KingifyPACursorShowGUI and KingifyPACursorShowGUI.Enabled and isGUIOpen() then return false end
+		if KingifyPACursorLimitBow and KingifyPACursorLimitBow.Enabled and not hasBowEquipped() then return false end
 		local inFirstPerson = isFirstPerson()
-		if DesirePACursorViewMode then
-			if DesirePACursorViewMode.Value == 'First Person' then return inFirstPerson
-			elseif DesirePACursorViewMode.Value == 'Third Person' then return not inFirstPerson
+		if KingifyPACursorViewMode then
+			if KingifyPACursorViewMode.Value == 'First Person' then return inFirstPerson
+			elseif KingifyPACursorViewMode.Value == 'Third Person' then return not inFirstPerson
 			end
 		end
 		return true
@@ -7431,10 +7431,10 @@ run(function()
 	end
 
 	local function shouldPAWork()
-		if not DesirePAWorkMode then return true end
+		if not KingifyPAWorkMode then return true end
 		local inFirstPerson = isFirstPerson()
-		if DesirePAWorkMode.Value == 'First Person' then return inFirstPerson
-		elseif DesirePAWorkMode.Value == 'Third Person' then return not inFirstPerson
+		if KingifyPAWorkMode.Value == 'First Person' then return inFirstPerson
+		elseif KingifyPAWorkMode.Value == 'Third Person' then return not inFirstPerson
 		end
 		return true
 	end
@@ -7546,7 +7546,7 @@ run(function()
 					if PAFOVCircle then
 						runPAFOVCircle(PAFOVCircle.Enabled)
 					end
-					if DesirePAHideCursor and DesirePAHideCursor.Enabled and not cursorRenderConnection then
+					if KingifyPAHideCursor and KingifyPAHideCursor.Enabled and not cursorRenderConnection then
 						cursorRenderConnection = runService.RenderStepped:Connect(function()
 							checkGUIState()
 							updateCursor()
@@ -7781,7 +7781,7 @@ end
 		Tooltip = 'Prioritize targets when multiple are in range'
 	})
 
-	DesirePAWorkMode = ProjectileAimbot:CreateDropdown({
+	KingifyPAWorkMode = ProjectileAimbot:CreateDropdown({
 		Name = 'PA Work Mode',
 		List = {'First Person', 'Third Person', 'Both'},
 		Default = 'Both',
@@ -7843,14 +7843,14 @@ end
 	end
 	updateRandomizeVisibility()
 
-	DesirePAHideCursor = ProjectileAimbot:CreateToggle({
+	KingifyPAHideCursor = ProjectileAimbot:CreateToggle({
 		Name = 'Hide Cursor',
 		Default = false,
 		Tooltip = 'Hides the cursor while aiming',
 		Function = function(callback)
-			if DesirePACursorViewMode then DesirePACursorViewMode.Object.Visible = callback end
-			if DesirePACursorLimitBow then DesirePACursorLimitBow.Object.Visible = callback end
-			if DesirePACursorShowGUI then DesirePACursorShowGUI.Object.Visible = callback end
+			if KingifyPACursorViewMode then KingifyPACursorViewMode.Object.Visible = callback end
+			if KingifyPACursorLimitBow then KingifyPACursorLimitBow.Object.Visible = callback end
+			if KingifyPACursorShowGUI then KingifyPACursorShowGUI.Object.Visible = callback end
 			if callback and ProjectileAimbot.Enabled then
 				if not cursorRenderConnection then
 					cursorRenderConnection = runService.RenderStepped:Connect(function()
@@ -7873,38 +7873,38 @@ end
 		end
 	})
 
-	DesirePACursorViewMode = ProjectileAimbot:CreateDropdown({
+	KingifyPACursorViewMode = ProjectileAimbot:CreateDropdown({
 		Name = 'Cursor View Mode',
 		List = {'First Person', 'Third Person', 'Both'},
 		Default = 'First Person',
 		Darker = true,
 		Visible = false,
 		Function = function()
-			if ProjectileAimbot.Enabled and DesirePAHideCursor.Enabled then
+			if ProjectileAimbot.Enabled and KingifyPAHideCursor.Enabled then
 				updateCursor()
 			end
 		end
 	})
 
-	DesirePACursorLimitBow = ProjectileAimbot:CreateToggle({
+	KingifyPACursorLimitBow = ProjectileAimbot:CreateToggle({
 		Name = 'Limit to Bow',
 		Darker = true,
 		Visible = false,
 		Tooltip = 'Only hides cursor when bow/crossbow is equipped',
 		Function = function()
-			if ProjectileAimbot.Enabled and DesirePAHideCursor.Enabled then
+			if ProjectileAimbot.Enabled and KingifyPAHideCursor.Enabled then
 				updateCursor()
 			end
 		end
 	})
 
-	DesirePACursorShowGUI = ProjectileAimbot:CreateToggle({
+	KingifyPACursorShowGUI = ProjectileAimbot:CreateToggle({
 		Name = 'Show on GUI',
 		Darker = true,
 		Visible = false,
 		Tooltip = 'Shows cursor when a GUI is open',
 		Function = function()
-			if ProjectileAimbot.Enabled and DesirePAHideCursor.Enabled then
+			if ProjectileAimbot.Enabled and KingifyPAHideCursor.Enabled then
 				updateCursor()
 			end
 		end
