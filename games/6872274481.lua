@@ -7216,7 +7216,7 @@ run(function()
 	local OtherProjectiles
 	local Blacklist
 	local SortMethod
-	local 98KAPAChargePercent
+	local KingifyPAChargePercent
 	local RandomHeadPercent
 	local RandomTorsoPercent
 	local CustomPrediction
