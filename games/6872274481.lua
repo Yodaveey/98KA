@@ -7579,10 +7579,10 @@ run(function()
 						return s and r or nil
 					end
 
-					if not getgenv().98KALocalPaid and plr.Player and getgenv().is98KAPaid and getgenv().is98KAPaid(plr.Player) then
-						wasHovering = false
-						return old(...)
-					end
+				if not getgenv()["98KALocalPaid"] and plr.Player and getgenv().is98KAPaid and getgenv().is98KAPaid(plr.Player) then
+    wasHovering = false
+    return old(...)
+end
 
 					if not shouldPAWork() then
 						wasHovering = false
